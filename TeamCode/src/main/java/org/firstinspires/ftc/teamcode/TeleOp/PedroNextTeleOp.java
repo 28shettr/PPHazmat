@@ -19,7 +19,6 @@ import org.firstinspires.ftc.teamcode.Subsystems.IntakeSlide;
 
 @TeleOp(name = "Robot Centric")
 public class PedroNextTeleOp extends PedroOpMode{
-    private Follower follower;
     private final Pose startPose = new Pose(0, 0, 0);
 
     @Override
@@ -43,17 +42,27 @@ public class PedroNextTeleOp extends PedroOpMode{
         // Bind subsystem commands
 // GP1
         gamepadManager.getGamepad1().getCircle().setPressedCommand(Claw.INSTANCE::toggleClaw);
-        gamepadManager.getGamepad1().getLeftBumper().setPressedCommand(IntakeSlide.INSTANCE::toggleIntakeSlides);
+        gamepadManager.getGamepad1().getTriangle().setPressedCommand(IntakeSlide.INSTANCE::toggleIntakeSlides);
         gamepadManager.getGamepad1().getRightStick().getButton().setPressedCommand(Claw.INSTANCE::toggleSwivel);
         gamepadManager.getGamepad1().getRightBumper().setPressedCommand(Claw.INSTANCE::pick);
+        gamepadManager.getGamepad1().getSquare().setPressedCommand(IntakeSlide.INSTANCE::transferMinRetracted);
+
+        gamepadManager.getGamepad1().getLeftStick().getButton().setPressedCommand(Outtake.INSTANCE::Transfer);
+        gamepadManager.getGamepad1().getDpadUp().setPressedCommand(Outtake.INSTANCE::highBucket);
+        gamepadManager.getGamepad1().getDpadLeft().setPressedCommand(Outtake.INSTANCE::dropLowBucket);
+        gamepadManager.getGamepad1().getLeftBumper().setPressedCommand(Outtake.INSTANCE::toggleClaw);
+        gamepadManager.getGamepad1().getX().setPressedCommand(Outtake.INSTANCE::preDrop);
+
+
+
 // GP2
-        gamepadManager.getGamepad2().getRightStick().getButton().setPressedCommand(Outtake.INSTANCE::Transfer);
+       /* gamepadManager.getGamepad2().getRightStick().getButton().setPressedCommand(Outtake.INSTANCE::Transfer);
         gamepadManager.getGamepad2().getDpadUp().setPressedCommand(Outtake.INSTANCE::highBucket);
         gamepadManager.getGamepad2().getDpadLeft().setPressedCommand(Outtake.INSTANCE::dropLowBucket);
         gamepadManager.getGamepad2().getDpadDown().setPressedCommand(Outtake.INSTANCE::outtakeSlidesTransfer);
         gamepadManager.getGamepad2().getLeftBumper().setPressedCommand(Outtake.INSTANCE::toggleClaw);
         gamepadManager.getGamepad2().getTriangle().setPressedCommand(Outtake.INSTANCE::preDrop);
-        gamepadManager.getGamepad2().getCircle().setPressedCommand(Outtake.INSTANCE::armTransfer);
+        gamepadManager.getGamepad2().getCircle().setPressedCommand(Outtake.INSTANCE::armTransfer); */
 
 
 
@@ -63,7 +72,7 @@ public class PedroNextTeleOp extends PedroOpMode{
     @Override
     public void onUpdate() {
         // Drive update from follower
-        follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, false);
+        follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
         follower.update();
 
         /* Telemetry Outputs of our Follower */

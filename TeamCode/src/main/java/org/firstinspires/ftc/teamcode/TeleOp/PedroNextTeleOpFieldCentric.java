@@ -1,4 +1,4 @@
-/*package org.firstinspires.ftc.teamcode.TeleOp;
+package org.firstinspires.ftc.teamcode.TeleOp;
 
 import android.provider.SyncStateContract;
 
@@ -19,7 +19,6 @@ import org.firstinspires.ftc.teamcode.Subsystems.IntakeSlide;
 
 @TeleOp(name = "Field Centric")
 public class PedroNextTeleOpFieldCentric extends PedroOpMode{
-    private Follower follower;
     private final Pose startPose = new Pose(0, 0, 0);
 
     @Override
@@ -43,14 +42,27 @@ public class PedroNextTeleOpFieldCentric extends PedroOpMode{
         // Bind subsystem commands
 // GP1
         gamepadManager.getGamepad1().getCircle().setPressedCommand(Claw.INSTANCE::toggleClaw);
-        gamepadManager.getGamepad1().getLeftBumper().setPressedCommand(IntakeSlide.INSTANCE::toggleIntakeSlides);
+        gamepadManager.getGamepad1().getTriangle().setPressedCommand(IntakeSlide.INSTANCE::toggleIntakeSlides);
         gamepadManager.getGamepad1().getRightStick().getButton().setPressedCommand(Claw.INSTANCE::toggleSwivel);
         gamepadManager.getGamepad1().getRightBumper().setPressedCommand(Claw.INSTANCE::pick);
+        gamepadManager.getGamepad1().getSquare().setPressedCommand(IntakeSlide.INSTANCE::transferMinRetracted);
+
+        gamepadManager.getGamepad1().getLeftStick().getButton().setPressedCommand(Outtake.INSTANCE::Transfer);
+        gamepadManager.getGamepad1().getDpadUp().setPressedCommand(Outtake.INSTANCE::highBucket);
+        gamepadManager.getGamepad1().getDpadLeft().setPressedCommand(Outtake.INSTANCE::dropLowBucket);
+        gamepadManager.getGamepad1().getLeftBumper().setPressedCommand(Outtake.INSTANCE::toggleClaw);
+        gamepadManager.getGamepad1().getX().setPressedCommand(Outtake.INSTANCE::preDrop);
+
+
+
 // GP2
-        //gamepadManager.getGamepad2().getRightStick().getButton().setPressedCommand(Outtake.INSTANCE::Transfer);
-       // gamepadManager.getGamepad2().getDpadUp().setPressedCommand(Outtake.INSTANCE::highBucket);
-        //gamepadManager.getGamepad2().getDpadLeft().setPressedCommand(Outtake.INSTANCE::lowBucket);
+       /* gamepadManager.getGamepad2().getRightStick().getButton().setPressedCommand(Outtake.INSTANCE::Transfer);
+        gamepadManager.getGamepad2().getDpadUp().setPressedCommand(Outtake.INSTANCE::highBucket);
+        gamepadManager.getGamepad2().getDpadLeft().setPressedCommand(Outtake.INSTANCE::dropLowBucket);
+        gamepadManager.getGamepad2().getDpadDown().setPressedCommand(Outtake.INSTANCE::outtakeSlidesTransfer);
         gamepadManager.getGamepad2().getLeftBumper().setPressedCommand(Outtake.INSTANCE::toggleClaw);
+        gamepadManager.getGamepad2().getTriangle().setPressedCommand(Outtake.INSTANCE::preDrop);
+        gamepadManager.getGamepad2().getCircle().setPressedCommand(Outtake.INSTANCE::armTransfer); */
 
 
 
@@ -64,16 +76,16 @@ public class PedroNextTeleOpFieldCentric extends PedroOpMode{
         follower.update();
 
         /* Telemetry Outputs of our Follower */
-       /* telemetry.addData("X", follower.getPose().getX());
+        telemetry.addData("X", follower.getPose().getX());
         telemetry.addData("Y", follower.getPose().getY());
         telemetry.addData("Heading in Degrees", Math.toDegrees(follower.getPose().getHeading()));
 
         /* Update Telemetry to the Driver Hub */
-      /*  telemetry.update();
+        telemetry.update();
     }
 
     @Override
     public void onStop() {
         // no-op
     }
-} */
+}

@@ -8,11 +8,14 @@ import com.rowanmcalpin.nextftc.core.command.groups.ParallelGroup;
 import com.rowanmcalpin.nextftc.core.command.groups.SequentialGroup;
 import com.rowanmcalpin.nextftc.core.command.utility.delays.Delay;
 import com.rowanmcalpin.nextftc.core.command.utility.delays.WaitUntil;
+import com.rowanmcalpin.nextftc.core.control.controllers.Controller;
 import com.rowanmcalpin.nextftc.core.control.controllers.PIDFController;
 import com.rowanmcalpin.nextftc.core.control.controllers.feedforward.StaticFeedforward;
 import com.rowanmcalpin.nextftc.core.units.TimeSpan;
 import com.rowanmcalpin.nextftc.ftc.OpModeData;
+import com.rowanmcalpin.nextftc.ftc.hardware.MotorHoldPosition;
 import com.rowanmcalpin.nextftc.ftc.hardware.ServoToPosition;
+import com.rowanmcalpin.nextftc.ftc.hardware.controllables.HoldPosition;
 import com.rowanmcalpin.nextftc.ftc.hardware.controllables.MotorEx;
 import com.rowanmcalpin.nextftc.ftc.hardware.controllables.MotorGroup;
 import com.rowanmcalpin.nextftc.ftc.hardware.controllables.ResetEncoder;
@@ -22,15 +25,13 @@ import com.rowanmcalpin.nextftc.ftc.hardware.controllables.RunToPosition;
 public class Outtake extends Subsystem {
     public static final Outtake INSTANCE = new Outtake();
     public Servo outtakeArmServo, outtakeWristServo, outtakeGripServo;
-    public MotorEx outtakeSlideLeft, outtakeSlideRight;
-    public MotorGroup outtakeMotor;
 
 
 
 
 
 
-    public PIDFController controller = new PIDFController(0.005, 0.0, 0.0, new StaticFeedforward(0.0));
+
 
 
 
@@ -55,8 +56,7 @@ public class Outtake extends Subsystem {
 
 
 
-   private OuttakeSlidesState SlidesState = OuttakeSlidesState.TRANSFER;
-        private enum OuttakeSlidesState {LOW_BUCKET, HIGH_BUCKET, TRANSFER}
+
 
 
 
@@ -72,9 +72,7 @@ public class Outtake extends Subsystem {
    private static final double ARM_INIT_POS = 0.04;
     private static final double ARM_AUTO_PARK_POS = 0.32;
 
-    private static final double OUTTAKESLIDES_TRANSFER_POS = 0;
-   private static final double OUTTAKESLIDES_highBUCKET_POS = 1300;
-   private static final double OUTTAKESLIDES_lowBUCKET_POS = 200;
+
 
 
 
@@ -84,8 +82,7 @@ public class Outtake extends Subsystem {
    public String Oarm = "outtake_arm";
 
 
-   public String OslideLeft = "outtake_slides_left";
-   public String OslideRight = "outtake_slides_right";
+
 
 
 
@@ -111,7 +108,7 @@ public class Outtake extends Subsystem {
 
         } else {
 
-           return preTransfer();
+           return OuttakeSlides.INSTANCE.preTransfer();
         }
     }
     // WRIST COMMANDS
@@ -161,50 +158,11 @@ public class Outtake extends Subsystem {
 
 
     // SLIDES COMMANDS
-    public Command outtakeSlidesTransfer() {
-        SlidesState = OuttakeSlidesState.TRANSFER;
-        return new RunToPosition(outtakeMotor, // MOTOR TO MOVE
-                OUTTAKESLIDES_TRANSFER_POS, // TARGET POSITION, IN TICKS
-                controller, // CONTROLLER TO IMPLEMENT
-                this); // IMPLEMENTED SUBSYSTEM
 
-
-    }
-
-
-
-    public Command lowBucket() {
-        SlidesState = OuttakeSlidesState.LOW_BUCKET;
-        return new RunToPosition(outtakeMotor, // MOTOR TO MOVE
-                OUTTAKESLIDES_lowBUCKET_POS, // TARGET POSITION, IN TICKS
-                controller, // CONTROLLER TO IMPLEMENT
-                this); // IMPLEMENTED SUBSYSTEM
-    }
-
-
-    public Command highBucket() {
-        SlidesState = OuttakeSlidesState.HIGH_BUCKET;
-        return new RunToPosition(outtakeMotor, // MOTOR TO MOVE
-                OUTTAKESLIDES_highBUCKET_POS, // TARGET POSITION, IN TICKS
-                controller, // CONTROLLER TO IMPLEMENT
-                this); // IMPLEMENTED SUBSYSTEM
-    }
 
 
     // TRANSFER COMMANDS
-   public Command preTransfer() {
-        return new SequentialGroup(
-                openClaw(),
-                new Delay(TimeSpan.fromMs(200)),
 
-                outtakeSlidesTransfer(),
-
-               armTransfer(),
-
-               wristTransfer()
-
-       );
-   }
 
 
 
@@ -220,7 +178,7 @@ public class Outtake extends Subsystem {
                 new Delay(TimeSpan.fromMs(100)),
                 armTransfer(),
                 openClaw(),
-                outtakeSlidesTransfer(),
+                 OuttakeSlides.INSTANCE.outtakeSlidesTransfer(),
                  new Delay(TimeSpan.fromMs(300)),
 
                  wristTransfer()
@@ -236,7 +194,7 @@ public class Outtake extends Subsystem {
                 Claw.INSTANCE.intakeArmPostTransfer(),
                 armDrop(),
                 wristDrop(),
-                highBucket()
+                OuttakeSlides.INSTANCE.highBucket()
 
 
 
@@ -245,13 +203,13 @@ public class Outtake extends Subsystem {
 
 
     // Bucket Drop
-    public Command autoMoveSlide() {
+    /*public Command autoMoveSlide() {
         if (SlidesState == OuttakeSlidesState.LOW_BUCKET) {
             return dropLowBucket();
         } else {
             return dropHighBucket();
         }
-    }
+    } */
     public Command preDrop() {
         return new ParallelGroup(
                 armDrop(),
@@ -262,7 +220,7 @@ public class Outtake extends Subsystem {
         return new ParallelGroup(
                 preDrop(),
 
-                lowBucket()
+                OuttakeSlides.INSTANCE.lowBucket()
         );
 
 
@@ -270,7 +228,7 @@ public class Outtake extends Subsystem {
     public Command dropHighBucket() {
         return new ParallelGroup(
                 preDrop(),
-                highBucket()
+                OuttakeSlides.INSTANCE.highBucket()
 
         );
 
@@ -292,7 +250,6 @@ public class Outtake extends Subsystem {
         outtakeWristServo = OpModeData.INSTANCE.getHardwareMap().get(Servo.class, Owrist);
         outtakeGripServo = OpModeData.INSTANCE.getHardwareMap().get(Servo.class, Ogrip);
 
-        outtakeMotor = new MotorGroup(new MotorEx(OslideLeft).reverse(), new MotorEx(OslideRight));
 
 
 

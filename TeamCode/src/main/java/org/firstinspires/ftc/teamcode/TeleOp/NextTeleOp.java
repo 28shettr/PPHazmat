@@ -18,12 +18,13 @@ import com.rowanmcalpin.nextftc.ftc.gamepad.GamepadManager;
 import org.firstinspires.ftc.teamcode.Subsystems.Claw;
 import org.firstinspires.ftc.teamcode.Subsystems.IntakeSlide;
 import org.firstinspires.ftc.teamcode.Subsystems.Outtake;
+import org.firstinspires.ftc.teamcode.Subsystems.OuttakeSlides;
 
 @TeleOp(name = "NextFTC TeleOp Program Java")
 public class NextTeleOp extends PedroOpMode {
 
     public NextTeleOp() {
-        super(Claw.INSTANCE,IntakeSlide.INSTANCE,Outtake.INSTANCE);
+        super(Claw.INSTANCE,IntakeSlide.INSTANCE,Outtake.INSTANCE,OuttakeSlides.INSTANCE);
     }
     // Change the motor names to suit your robot.
     public String frontLeftName = "leftFront_par0";
@@ -72,7 +73,7 @@ public class NextTeleOp extends PedroOpMode {
         gamepadManager.getGamepad1().getSquare().setPressedCommand(IntakeSlide.INSTANCE::transferMinRetracted);
 
         gamepadManager.getGamepad1().getLeftStick().getButton().setPressedCommand(Outtake.INSTANCE::Transfer);
-        gamepadManager.getGamepad1().getDpadUp().setPressedCommand(Outtake.INSTANCE::highBucket);
+        gamepadManager.getGamepad1().getDpadUp().setPressedCommand(OuttakeSlides.INSTANCE::highBucket);
         gamepadManager.getGamepad1().getDpadLeft().setPressedCommand(Outtake.INSTANCE::dropLowBucket);
         gamepadManager.getGamepad1().getLeftBumper().setPressedCommand(Outtake.INSTANCE::toggleClaw);
         gamepadManager.getGamepad1().getX().setPressedCommand(Outtake.INSTANCE::preDrop);

@@ -22,6 +22,7 @@ import com.rowanmcalpin.nextftc.pedro.PedroOpMode;
 import org.firstinspires.ftc.teamcode.Subsystems.Claw;
 import org.firstinspires.ftc.teamcode.Subsystems.IntakeSlide;
 import org.firstinspires.ftc.teamcode.Subsystems.Outtake;
+import org.firstinspires.ftc.teamcode.Subsystems.OuttakeSlides;
 import org.firstinspires.ftc.teamcode.tuners_tests.constants.FConstants;
 import org.firstinspires.ftc.teamcode.tuners_tests.constants.LConstants;
 
@@ -308,7 +309,7 @@ public class PedroAuto extends PedroOpMode {
                         Outtake.INSTANCE.toggleClaw(),
 
                         new FollowPath(park),
-                        Outtake.INSTANCE.outtakeSlidesTransfer(),
+                        OuttakeSlides.INSTANCE.outtakeSlidesTransfer(),
                         Outtake.INSTANCE.armPark()
                 ),
                         Outtake.INSTANCE.wristPark()

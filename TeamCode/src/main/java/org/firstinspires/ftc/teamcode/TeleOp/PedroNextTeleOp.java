@@ -12,6 +12,7 @@ import com.rowanmcalpin.nextftc.pedro.PedroOpMode;
 import com.rowanmcalpin.nextftc.ftc.gamepad.GamepadManager;
 
 import org.firstinspires.ftc.teamcode.Subsystems.Outtake;
+import org.firstinspires.ftc.teamcode.Subsystems.OuttakeSlides;
 import org.firstinspires.ftc.teamcode.tuners_tests.constants.FConstants;
 import org.firstinspires.ftc.teamcode.tuners_tests.constants.LConstants;
 import org.firstinspires.ftc.teamcode.Subsystems.Claw;
@@ -41,6 +42,7 @@ public class PedroNextTeleOp extends PedroOpMode{
 
         // Bind subsystem commands
 // GP1
+
         gamepadManager.getGamepad1().getCircle().setPressedCommand(Claw.INSTANCE::toggleClaw);
         gamepadManager.getGamepad1().getTriangle().setPressedCommand(IntakeSlide.INSTANCE::toggleIntakeSlides);
         gamepadManager.getGamepad1().getRightStick().getButton().setPressedCommand(Claw.INSTANCE::toggleSwivel);
@@ -48,8 +50,9 @@ public class PedroNextTeleOp extends PedroOpMode{
         gamepadManager.getGamepad1().getSquare().setPressedCommand(IntakeSlide.INSTANCE::transferMinRetracted);
 
         gamepadManager.getGamepad1().getLeftStick().getButton().setPressedCommand(Outtake.INSTANCE::Transfer);
-        gamepadManager.getGamepad1().getDpadUp().setPressedCommand(Outtake.INSTANCE::highBucket);
+        gamepadManager.getGamepad1().getDpadUp().setPressedCommand(OuttakeSlides.INSTANCE::highBucket);
         gamepadManager.getGamepad1().getDpadLeft().setPressedCommand(Outtake.INSTANCE::dropLowBucket);
+        gamepadManager.getGamepad1().getDpadDown().setPressedCommand(OuttakeSlides.INSTANCE::outtakeSlidesTransfer);
         gamepadManager.getGamepad1().getLeftBumper().setPressedCommand(Outtake.INSTANCE::toggleClaw);
         gamepadManager.getGamepad1().getX().setPressedCommand(Outtake.INSTANCE::preDrop);
 

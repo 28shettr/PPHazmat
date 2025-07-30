@@ -3,12 +3,14 @@ package org.firstinspires.ftc.teamcode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.rowanmcalpin.nextftc.core.command.Command;
+import com.rowanmcalpin.nextftc.core.command.CommandManager;
 import com.rowanmcalpin.nextftc.core.command.groups.ParallelGroup;
 import com.rowanmcalpin.nextftc.core.command.groups.SequentialGroup;
 import com.rowanmcalpin.nextftc.core.command.utility.delays.Delay;
 import com.rowanmcalpin.nextftc.core.units.TimeSpan;
 import com.rowanmcalpin.nextftc.ftc.driving.MecanumDriverControlled;
 import com.rowanmcalpin.nextftc.ftc.hardware.controllables.MotorEx;
+import com.rowanmcalpin.nextftc.pedro.DriverControlled;
 import com.rowanmcalpin.nextftc.pedro.PedroOpMode;
 import com.rowanmcalpin.nextftc.ftc.gamepad.Button;
 import com.rowanmcalpin.nextftc.ftc.gamepad.GamepadManager;
@@ -24,7 +26,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.OuttakeSlides;
 public class NextTeleOp extends PedroOpMode {
 
     public NextTeleOp() {
-        super(Claw.INSTANCE,IntakeSlide.INSTANCE,Outtake.INSTANCE,OuttakeSlides.INSTANCE);
+        super(Claw.INSTANCE,IntakeSlide.INSTANCE,Outtake.INSTANCE);
     }
     // Change the motor names to suit your robot.
     public String frontLeftName = "leftFront_par0";
@@ -55,6 +57,8 @@ public class NextTeleOp extends PedroOpMode {
         backRightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         motors = new MotorEx[] {frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor};
+
+
     }
 
     @Override
@@ -62,6 +66,7 @@ public class NextTeleOp extends PedroOpMode {
 
         driverControlled = new MecanumDriverControlled(motors, gamepadManager.getGamepad1());
         driverControlled.invoke();
+
 
 
         // Bind subsystem commands
@@ -73,13 +78,13 @@ public class NextTeleOp extends PedroOpMode {
         gamepadManager.getGamepad1().getSquare().setPressedCommand(IntakeSlide.INSTANCE::transferMinRetracted);
 
         gamepadManager.getGamepad1().getLeftStick().getButton().setPressedCommand(Outtake.INSTANCE::Transfer);
-        gamepadManager.getGamepad1().getDpadUp().setPressedCommand(OuttakeSlides.INSTANCE::highBucket);
+        gamepadManager.getGamepad1().getDpadUp().setPressedCommand(Outtake.INSTANCE::highBucket);
         gamepadManager.getGamepad1().getDpadLeft().setPressedCommand(Outtake.INSTANCE::dropLowBucket);
-        gamepadManager.getGamepad1().getLeftBumper().setPressedCommand(Outtake.INSTANCE::toggleClaw);
+        gamepadManager.getGamepad1().getDpadDown().setPressedCommand(Outtake.INSTANCE::outtakeSlidesTransfer);
+        gamepadManager.getGamepad1().getDpadRight().setPressedCommand(Outtake.INSTANCE::toggleClaw);
+
+        gamepadManager.getGamepad1().getLeftBumper().setPressedCommand(Outtake.INSTANCE::preTransfer);
         gamepadManager.getGamepad1().getX().setPressedCommand(Outtake.INSTANCE::preDrop);
-
-
-
 // GP2
        /* gamepadManager.getGamepad2().getRightStick().getButton().setPressedCommand(Outtake.INSTANCE::Transfer);
         gamepadManager.getGamepad2().getDpadUp().setPressedCommand(Outtake.INSTANCE::highBucket);
@@ -88,6 +93,7 @@ public class NextTeleOp extends PedroOpMode {
         gamepadManager.getGamepad2().getLeftBumper().setPressedCommand(Outtake.INSTANCE::toggleClaw);
         gamepadManager.getGamepad2().getTriangle().setPressedCommand(Outtake.INSTANCE::preDrop);
         gamepadManager.getGamepad2().getCircle().setPressedCommand(Outtake.INSTANCE::armTransfer); */
+
 
 
 

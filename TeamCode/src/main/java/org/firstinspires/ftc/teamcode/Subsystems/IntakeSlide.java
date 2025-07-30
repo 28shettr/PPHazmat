@@ -90,7 +90,6 @@ public class IntakeSlide extends Subsystem {
                 new Delay(TimeSpan.fromMs(167)),
                 Outtake.INSTANCE.armInit(),
                 Outtake.INSTANCE.wristInit(),
-                new Delay(TimeSpan.fromMs(1000)),
                 Outtake.INSTANCE.closeClaw()
 
 

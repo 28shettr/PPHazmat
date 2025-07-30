@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.rowanmcalpin.nextftc.core.Subsystem;
 import com.rowanmcalpin.nextftc.core.command.Command;
@@ -10,10 +11,13 @@ import com.rowanmcalpin.nextftc.core.units.TimeSpan;
 import com.rowanmcalpin.nextftc.ftc.OpModeData;
 import com.rowanmcalpin.nextftc.ftc.hardware.ServoToPosition;
 
+import org.firstinspires.ftc.robotcontroller.external.samples.SensorColor;
+
 public class Claw extends Subsystem {
     // BOILERPLATE
     public static final Claw INSTANCE = new Claw();
     public Servo intakeGripServo, intakeSwivelServo, intakeWristServo, intakeArmServo;
+
 
     // State enums for Claw and Swivel
     private enum IntakeGripState { OPEN, CLOSED }
@@ -124,8 +128,7 @@ public class Claw extends Subsystem {
     }
 
     public Command pick() {
-
-        return new SequentialGroup(
+       return new SequentialGroup(
 
          new ParallelGroup(
                 Claw.INSTANCE.intakeArmPre_PostPickup(),

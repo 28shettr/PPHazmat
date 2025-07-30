@@ -20,6 +20,9 @@ import org.firstinspires.ftc.teamcode.Subsystems.IntakeSlide;
 
 @TeleOp(name = "Robot Centric")
 public class PedroNextTeleOp extends PedroOpMode{
+    public PedroNextTeleOp() {
+        super(Claw.INSTANCE,IntakeSlide.INSTANCE,Outtake.INSTANCE);
+    }
     private final Pose startPose = new Pose(0, 0, 0);
 
     @Override
@@ -30,10 +33,7 @@ public class PedroNextTeleOp extends PedroOpMode{
 
     }
 
-    @Override
-    public void onWaitForStart() {
 
-    }
 
     @Override
     public void onStartButtonPressed() {
@@ -50,9 +50,9 @@ public class PedroNextTeleOp extends PedroOpMode{
         gamepadManager.getGamepad1().getSquare().setPressedCommand(IntakeSlide.INSTANCE::transferMinRetracted);
 
         gamepadManager.getGamepad1().getLeftStick().getButton().setPressedCommand(Outtake.INSTANCE::Transfer);
-        gamepadManager.getGamepad1().getDpadUp().setPressedCommand(OuttakeSlides.INSTANCE::highBucket);
+        gamepadManager.getGamepad1().getDpadUp().setPressedCommand(Outtake.INSTANCE::highBucket);
         gamepadManager.getGamepad1().getDpadLeft().setPressedCommand(Outtake.INSTANCE::dropLowBucket);
-        gamepadManager.getGamepad1().getDpadDown().setPressedCommand(OuttakeSlides.INSTANCE::outtakeSlidesTransfer);
+        gamepadManager.getGamepad1().getDpadDown().setPressedCommand(Outtake.INSTANCE::outtakeSlidesTransfer);
         gamepadManager.getGamepad1().getLeftBumper().setPressedCommand(Outtake.INSTANCE::toggleClaw);
         gamepadManager.getGamepad1().getX().setPressedCommand(Outtake.INSTANCE::preDrop);
 
@@ -77,9 +77,9 @@ public class PedroNextTeleOp extends PedroOpMode{
         // Drive update from follower
         follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
         follower.update();
-
+        double currentX = follower.getPose().getX();
         /* Telemetry Outputs of our Follower */
-        telemetry.addData("X", follower.getPose().getX());
+        telemetry.addData("X",  currentX );
         telemetry.addData("Y", follower.getPose().getY());
         telemetry.addData("Heading in Degrees", Math.toDegrees(follower.getPose().getHeading()));
 
@@ -87,8 +87,4 @@ public class PedroNextTeleOp extends PedroOpMode{
        telemetry.update();
     }
 
-    @Override
-    public void onStop() {
-        // no-op
-    }
 }

@@ -309,7 +309,7 @@ public class PedroAuto extends PedroOpMode {
                         Outtake.INSTANCE.toggleClaw(),
 
                         new FollowPath(park),
-                        OuttakeSlides.INSTANCE.outtakeSlidesTransfer(),
+                        Outtake.INSTANCE.outtakeSlidesTransfer(),
                         Outtake.INSTANCE.armPark()
                 ),
                         Outtake.INSTANCE.wristPark()
@@ -340,7 +340,9 @@ public class PedroAuto extends PedroOpMode {
     /** This method is called once at the init of the OpMode. **/
     @Override
     public void onInit() {
-        IntakeSlide.INSTANCE.Init();
+        IntakeSlide.INSTANCE.Init().invoke();
+        Outtake.INSTANCE.resetEncoder().invoke();
+
 
         follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
         follower.setStartingPose(startPose);

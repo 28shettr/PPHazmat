@@ -1,32 +1,21 @@
-package org.firstinspires.ftc.teamcode.TeleOp;
+package org.firstinspires.ftc.teamcode.Tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.rowanmcalpin.nextftc.core.command.Command;
-import com.rowanmcalpin.nextftc.core.command.CommandManager;
-import com.rowanmcalpin.nextftc.core.command.groups.ParallelGroup;
-import com.rowanmcalpin.nextftc.core.command.groups.SequentialGroup;
-import com.rowanmcalpin.nextftc.core.command.utility.delays.Delay;
-import com.rowanmcalpin.nextftc.core.units.TimeSpan;
-import com.rowanmcalpin.nextftc.ftc.OpModeData;
 import com.rowanmcalpin.nextftc.ftc.driving.MecanumDriverControlled;
 import com.rowanmcalpin.nextftc.ftc.hardware.controllables.MotorEx;
-import com.rowanmcalpin.nextftc.pedro.DriverControlled;
 import com.rowanmcalpin.nextftc.pedro.PedroOpMode;
-import com.rowanmcalpin.nextftc.ftc.gamepad.Button;
-import com.rowanmcalpin.nextftc.ftc.gamepad.GamepadManager;
-
 
 
 import org.firstinspires.ftc.teamcode.Subsystems.Claw;
 import org.firstinspires.ftc.teamcode.Subsystems.IntakeSlide;
 import org.firstinspires.ftc.teamcode.Subsystems.Outtake;
-import org.firstinspires.ftc.teamcode.Subsystems.OuttakeSlides;
 
-@TeleOp(name = "NextFTC TeleOp Program Java")
-public class NextTeleOp extends PedroOpMode {
+@TeleOp(name = "Calibration")
+public class Calibration extends PedroOpMode {
 
-    public NextTeleOp() {
+    public Calibration() {
         super(Claw.INSTANCE,IntakeSlide.INSTANCE,Outtake.INSTANCE);
     }
     // Change the motor names to suit your robot.
@@ -67,28 +56,16 @@ public class NextTeleOp extends PedroOpMode {
     public void onStartButtonPressed() {
 
 
-                driverControlled = new MecanumDriverControlled(motors, gamepadManager.getGamepad1());
+        driverControlled = new MecanumDriverControlled(motors, gamepadManager.getGamepad1());
         driverControlled.invoke();
 
 
         // Bind subsystem commands
 // GP1
-        gamepadManager.getGamepad1().getCircle().setPressedCommand(Claw.INSTANCE::toggleClaw);
-        gamepadManager.getGamepad1().getTriangle().setPressedCommand(IntakeSlide.INSTANCE::toggleIntakeSlides);
-        gamepadManager.getGamepad1().getRightStick().getButton().setPressedCommand(Claw.INSTANCE::toggleSwivel);
-        gamepadManager.getGamepad1().getRightBumper().setPressedCommand(Claw.INSTANCE::pick);
+        gamepadManager.getGamepad1().getDpadRight().setPressedCommand(Claw.INSTANCE::ClawServoUp);
+        gamepadManager.getGamepad1().getDpadLeft().setPressedCommand(Claw.INSTANCE::ClawServoDown);
 
-        gamepadManager.getGamepad1().getSquare().setPressedCommand(IntakeSlide.INSTANCE::transferMinRetracted);
-
-        gamepadManager.getGamepad1().getLeftStick().getButton().setPressedCommand(Outtake.INSTANCE::Transfer);
-        gamepadManager.getGamepad1().getDpadUp().setPressedCommand(Outtake.INSTANCE::highBucket);
-        gamepadManager.getGamepad1().getDpadLeft().setPressedCommand(Outtake.INSTANCE::dropLowBucket);
-        gamepadManager.getGamepad1().getDpadDown().setPressedCommand(Outtake.INSTANCE::outtakeSlidesTransfer);
-        gamepadManager.getGamepad1().getDpadRight().setPressedCommand(Outtake.INSTANCE::toggleClaw);
-
-//gamepadManager.getGamepad1().getLeftTrigger().setPressedCommand(value -> Outtake.INSTANCE.preTransferAuto());
-        gamepadManager.getGamepad1().getLeftBumper().setPressedCommand(Outtake.INSTANCE::preTransferAuto);
-        gamepadManager.getGamepad1().getX().setPressedCommand(Outtake.INSTANCE::preDrop);
+        /**/
 // GP2
        /* gamepadManager.getGamepad2().getRightStick().getButton().setPressedCommand(Outtake.INSTANCE::Transfer);
         gamepadManager.getGamepad2().getDpadUp().setPressedCommand(Outtake.INSTANCE::highBucket);
@@ -103,8 +80,11 @@ public class NextTeleOp extends PedroOpMode {
 
 
 
+        telemetry.addLine("Intake Grip: GP1 + Dpad_right, - Dpad_left");
+        telemetry.addData("    Grip Position", Claw.INSTANCE.intakeGripServo.getPosition());
+        telemetry.addLine("----------");
 
-
+        telemetry.update();
 
     }
 

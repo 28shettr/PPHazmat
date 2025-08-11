@@ -25,7 +25,7 @@ public class IntakeSlide extends Subsystem {
 
     // Servo position constants
     private static final double LEFT_RETRACTED_POS   = 0.21;
-    private static final double RIGHT_RETRACTED_POS  = 0.225;
+    private static final double RIGHT_RETRACTED_POS  = 0.255;
     private static final double LEFT_INBETWEEN_POS   = 0.35;
     private static final double RIGHT_INBETWEEN_POS  = 0.395;
     private static final double LEFT_EXTENDED_POS    = 0.575;
@@ -72,7 +72,13 @@ public class IntakeSlide extends Subsystem {
     public Command toggleIntakeSlides() {
         if (extensionState == ExtensionState.RETRACTED) {
             Claw.INSTANCE.prePick();
-            return inBetween();
+            return new ParallelGroup(
+             inBetween(),
+                    Outtake.INSTANCE.armTransfer(),
+                    Outtake.INSTANCE.wristTransfer(),
+                    Claw.INSTANCE.setPick()
+
+            );
 
         } else   {
             Claw.INSTANCE.prePick();
@@ -81,27 +87,19 @@ public class IntakeSlide extends Subsystem {
 
         }
     }
-    public Command Init() {
-        return new ParallelGroup(
-                transferMinRetracted(),
-                Claw.INSTANCE.openClaw(),
-                Claw.INSTANCE.intakeArmTransfer(),
-                Claw.INSTANCE.wristTransfer(),
-                new Delay(TimeSpan.fromMs(167)),
-                Outtake.INSTANCE.armInit(),
-                Outtake.INSTANCE.wristInit(),
-                Outtake.INSTANCE.closeClaw()
 
 
 
-                );
 
-
-    }
 
     @Override
     public void initialize() {
         intakeSlideServoLeft  = OpModeData.INSTANCE.getHardwareMap().get(Servo.class, slideLeft);
         intakeSlideServoRight = OpModeData.INSTANCE.getHardwareMap().get(Servo.class, slideRight);
+
+        intakeSlideServoLeft.setPosition(LEFT_RETRACTED_POS);
+        intakeSlideServoRight.setPosition(RIGHT_RETRACTED_POS);
+
+
     }
 }

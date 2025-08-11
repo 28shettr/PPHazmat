@@ -31,10 +31,14 @@ public class Claw extends Subsystem {
     // Servo position constants
     private static final double GRIP_OPEN_POS     = 0.57;
     private static final double GRIP_CLOSED_POS   = 0.23;
+    private static final double GRIP_LOOSE_POS   = 0.26;
+
     private static final double SWIVEL_180_POS    = 0.225;
     private static final double SWIVEL_CENTER_POS = 0.495;
     private static final double WRIST_PICKUP_POS  = 0.88;
     private static final double WRIST_POST_POS    = 0.56;
+    private static final double WRIST_INIT_POS    = 0.16;
+
     private static final double WRIST_TRANSFER_POS    = 0.21;
     private static final double WRIST_postTRANSFER_POS    = 0.38;
     private static final double ARM_PREPOST_POS   = 0.40;
@@ -62,6 +66,21 @@ public class Claw extends Subsystem {
         GripState = IntakeGripState.CLOSED;
         return new ServoToPosition(intakeGripServo, GRIP_CLOSED_POS, this);
     }
+    public Command loosenClaw() {
+        return new ServoToPosition(intakeGripServo, GRIP_LOOSE_POS, this);
+    }
+    public Command ClawServoUp() {
+        double current = intakeGripServo.getPosition();
+        double next = Math.min(1.0, current + 0.01);  // Clamp to 1.0
+        return new ServoToPosition(intakeGripServo, next, this);
+
+    }
+    public Command ClawServoDown() {
+        double current = intakeGripServo.getPosition();
+        double next = Math.max(0, current - 0.01);  // Clamp to 1.0
+        return new ServoToPosition(intakeGripServo, next, this);
+
+    }
 
     public Command toggleClaw() {
         if (GripState == IntakeGripState.OPEN) {
@@ -70,6 +89,7 @@ public class Claw extends Subsystem {
             return openClaw();
         }
     }
+
 
     // Swivel Commands
     public Command swivel180() {
@@ -126,6 +146,13 @@ public class Claw extends Subsystem {
                 Claw.INSTANCE.openClaw()
         );
     }
+    public Command setPick(){
+       return new ParallelGroup(
+                Claw.INSTANCE.intakeArmPre_PostPickup(),
+                Claw.INSTANCE.wristPickup(),
+                Claw.INSTANCE.openClaw()
+        );
+    }
 
     public Command pick() {
        return new SequentialGroup(
@@ -141,10 +168,21 @@ public class Claw extends Subsystem {
                 new Delay(TimeSpan.fromMs(150)),
                 Claw.INSTANCE.closeClaw(),
                 new Delay(TimeSpan.fromMs(67)),
-                Claw.INSTANCE.intakeArmPre_PostPickup()
+                Claw.INSTANCE.intakeArmPre_PostPickup(),
+               IntakeSensor.INSTANCE.checkSample()
 
 
+
+       );
+    }
+
+
+    public Command autoPickTransfer() {
+        return new SequentialGroup(
+                pick(),
+                IntakeSensor.INSTANCE.autoTransfer()
         );
+
     }
     @Override
     public void initialize() {
@@ -152,5 +190,12 @@ public class Claw extends Subsystem {
         intakeSwivelServo = OpModeData.INSTANCE.getHardwareMap().get(Servo.class, swivel);
         intakeWristServo = OpModeData.INSTANCE.getHardwareMap().get(Servo.class, wrist);
         intakeArmServo = OpModeData.INSTANCE.getHardwareMap().get(Servo.class, arm);
+
+        new Delay(TimeSpan.fromMs(300));
+                intakeGripServo.setPosition(GRIP_OPEN_POS);
+        intakeSwivelServo.setPosition(SWIVEL_CENTER_POS);
+        intakeArmServo.setPosition(ARM_TRANSFER);
+        intakeWristServo.setPosition(WRIST_INIT_POS);
+
     }
 }

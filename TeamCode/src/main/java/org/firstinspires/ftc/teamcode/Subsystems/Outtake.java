@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1;
+
 import androidx.annotation.NonNull;
 
+import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.rowanmcalpin.nextftc.core.Subsystem;
 import com.rowanmcalpin.nextftc.core.command.Command;
@@ -25,6 +28,8 @@ import com.rowanmcalpin.nextftc.ftc.hardware.controllables.RunToPosition;
 import com.rowanmcalpin.nextftc.pedro.DisplacementDelay;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.SensorColor;
+import org.firstinspires.ftc.teamcode.tuners_tests.constants.FConstants;
+import org.firstinspires.ftc.teamcode.tuners_tests.constants.LConstants;
 
 
 public class Outtake extends Subsystem {
@@ -137,6 +142,27 @@ public class Outtake extends Subsystem {
                 OUTTAKESLIDES_highBUCKET_POS, // TARGET POSITION, IN TICKS
                 controller, // CONTROLLER TO IMPLEMENT
                 this); // IMPLEMENTED SUBSYSTEM
+
+    }
+    public Command highBucketTest() {
+        SlidesState = OuttakeSlidesState.HIGH_BUCKET;
+        return new RunToPosition(outtakeMotor, // MOTOR TO MOVE
+                OUTTAKESLIDES_highBUCKET_POS, // TARGET POSITION, IN TICKS
+                controller, // CONTROLLER TO IMPLEMENT
+                this); // IMPLEMENTED SUBSYSTEM
+
+
+    }
+
+    public Command autoHighBucket() {
+        SlidesState = OuttakeSlidesState.HIGH_BUCKET;
+        return new SequentialGroup(
+         highBucket(),
+        new ParallelGroup(
+        armDrop(),
+                wristDrop()
+        )
+        );
     }
     public Command   preTransfer() {
         return new SequentialGroup(
@@ -146,8 +172,24 @@ public class Outtake extends Subsystem {
                 new Delay(TimeSpan.fromSec(.5)),
                 Outtake.INSTANCE.wristTransfer(),
                 Outtake.INSTANCE.armTransfer(),
-                new Delay(TimeSpan.fromSec(.5)),
+                new DisplacementDelay(4.0),
+                outtakeSlidesTransfer()
 
+
+
+
+        );
+    }
+
+    public Command   preTransferAuto() {
+        return new SequentialGroup(
+
+                Outtake.INSTANCE.openClaw(),
+
+                new Delay(TimeSpan.fromSec(.5)),
+                Outtake.INSTANCE.wristTransfer(),
+                Outtake.INSTANCE.armTransfer(),
+                new Delay(TimeSpan.fromSec(.2)),
                 outtakeSlidesTransfer()
 
 
@@ -192,7 +234,7 @@ public class Outtake extends Subsystem {
 
         } else {
 
-           return Outtake.INSTANCE.preTransfer();
+           return openClaw();
         }
     }
     // WRIST COMMANDS
@@ -258,6 +300,7 @@ public class Outtake extends Subsystem {
                 Claw.INSTANCE.swivelCentered(),
                 Claw.INSTANCE.intakeArmTransfer(),
                 Claw.INSTANCE.wristTransfer(),
+                Claw.INSTANCE.loosenClaw(),
                 IntakeSlide.INSTANCE.transferMinRetracted(),
                 new Delay(TimeSpan.fromMs(100)),
                 armTransfer(),
@@ -272,7 +315,7 @@ public class Outtake extends Subsystem {
 
 
                 closeClaw(),
-                new Delay(TimeSpan.fromMs(500)),
+                new Delay(TimeSpan.fromMs(350)),
 
                 Claw.INSTANCE.openClaw(),
                 Claw.INSTANCE.wristPostTransfer(),
@@ -338,6 +381,11 @@ public class Outtake extends Subsystem {
         outtakeWristServo = OpModeData.INSTANCE.getHardwareMap().get(Servo.class, Owrist);
         outtakeGripServo = OpModeData.INSTANCE.getHardwareMap().get(Servo.class, Ogrip);
         outtakeMotor = new MotorGroup(new MotorEx(OslideLeft).reverse(), new MotorEx(OslideRight));
+
+        outtakeArmServo.setPosition(ARM_INIT_POS);
+        outtakeWristServo.setPosition(WRIST_INIT_POS);
+
+
 
 
 

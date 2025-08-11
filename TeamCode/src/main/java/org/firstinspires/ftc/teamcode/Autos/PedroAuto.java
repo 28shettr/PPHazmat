@@ -16,6 +16,7 @@ import com.rowanmcalpin.nextftc.core.command.groups.ParallelGroup;
 import com.rowanmcalpin.nextftc.core.command.groups.SequentialGroup;
 import com.rowanmcalpin.nextftc.core.command.utility.delays.Delay;
 import com.rowanmcalpin.nextftc.core.units.TimeSpan;
+import com.rowanmcalpin.nextftc.ftc.OpModeData;
 import com.rowanmcalpin.nextftc.pedro.FollowPath;
 import com.rowanmcalpin.nextftc.pedro.PedroOpMode;
 
@@ -60,23 +61,23 @@ public class PedroAuto extends PedroOpMode {
     private final Pose startPose = new Pose(0, 0, Math.toRadians(0));
 
     /** Scoring Pose of our robot. It is facing the submersible at a -45 degree (315 degree) angle. */
-    private final Pose scorePose = new Pose(8.5692, 12.6025, Math.toRadians(317.89));
+    private final Pose scorePose = new Pose(10.67, 12.5, Math.toRadians(326.2769));
 
     /** Lowest (First) Sample from the Spike Mark */
-    private final Pose pickup1Pose = new Pose(15.93, 12.066, Math.toRadians(339));
+    private final Pose pickup1Pose = new Pose(10.68, 12.6, Math.toRadians(335.63));
 
     /** Middle (Second) Sample from the Spike Mark */
-    private final Pose pickup2Pose = new Pose(17.5209, 18.4434, Math.toRadians(0));
+    private final Pose pickup2Pose = new Pose(17.47, 19.17, Math.toRadians(354.88));
 
     /** Highest (Third) Sample from the Spike Mark */
-    private final Pose pickup3Pose = new Pose(15.2102, 13.8059, Math.toRadians(33.0748));
+    private final Pose pickup3Pose = new Pose(20.75, 17.9175, Math.toRadians(34.6144));
 
     /** Park Pose for our robot, after we do all of the scoring. */
-    private final Pose parkPose = new Pose(52.47, -15.2122, Math.toRadians(270));
+    private final Pose parkPose = new Pose(56.3236, -17.465, Math.toRadians(270));
 
     /** Park Control Pose for our robot, this is used to manipulate the bezier curve that we will create for the parking.
      * The Robot will not go to this pose, it is used a control point for our bezier curve. */
-    private final Pose parkControlPose = new Pose(52.47, 3, Math.toRadians(90));
+    private final Pose parkControlPose = new Pose(56.3236, 3, Math.toRadians(90));
 
     /* These are our Paths and PathChains that we will define in buildPaths() */
     private Path scorePreload, park;
@@ -142,6 +143,7 @@ public class PedroAuto extends PedroOpMode {
                 .addPath(new BezierLine(new Point(scorePose), new Point(pickup3Pose)))
                 .setLinearHeadingInterpolation(scorePose.getHeading(), pickup3Pose.getHeading())
                 .setPathEndTimeoutConstraint(0.3)
+                
 
 
                 .build();
@@ -260,28 +262,37 @@ public class PedroAuto extends PedroOpMode {
         return new SequentialGroup( // Score preload
                 new ParallelGroup(
                         new FollowPath(scorePreload),
-                        Outtake.INSTANCE.dropHighBucket()
+
+                        Outtake.INSTANCE.preDrop(),
+
+                        Outtake.INSTANCE.highBucket().endAfter(TimeSpan.fromMs(500))
+
                 ), //Pickup Sample 1
-                new ParallelGroup(
-                        Outtake.INSTANCE.toggleClaw(),
+                new SequentialGroup(
+                        Outtake.INSTANCE.preTransferAuto(),
                         new Delay(TimeSpan.fromMs(200)),
                         new FollowPath(grabPickup1),
+                        new Delay(TimeSpan.fromMs(500)),
                         new SequentialGroup(
-                        IntakeSlide.INSTANCE.maxExtension(),
-                        Claw.INSTANCE.pick(),
-                        new ParallelGroup(
-                        Outtake.INSTANCE.Transfer(),
-                                new FollowPath(scorePickup1)
+                                IntakeSlide.INSTANCE.inBetween(),
+                                new Delay(TimeSpan.fromMs(500)),
+
+                                Claw.INSTANCE.pick(),
+                                new Delay(TimeSpan.fromMs(500)),
+
+                                new SequentialGroup(
+                                        Outtake.INSTANCE.Transfer(),
+                                        new FollowPath(scorePickup1)
                                 )
-                                )
+                        )
                 ),
                 //Pickup Sample 2
                 new ParallelGroup(
-                        Outtake.INSTANCE.toggleClaw(),
+                        Outtake.INSTANCE.preTransferAuto(),
                         new Delay(TimeSpan.fromMs(200)),
                         new FollowPath(grabPickup2),
                         new SequentialGroup(
-                                IntakeSlide.INSTANCE.maxExtension(),
+                                IntakeSlide.INSTANCE.inBetween(),
                                 Claw.INSTANCE.pick(),
                                 new ParallelGroup(
                                         Outtake.INSTANCE.Transfer(),
@@ -290,11 +301,11 @@ public class PedroAuto extends PedroOpMode {
                         )
                 ),//Pickup Sample 3
                 new ParallelGroup(
-                        Outtake.INSTANCE.toggleClaw(),
+                        Outtake.INSTANCE.preTransferAuto(),
                         new Delay(TimeSpan.fromMs(200)),
                         new FollowPath(grabPickup3),
                         new SequentialGroup(
-                                IntakeSlide.INSTANCE.maxExtension(),
+                                IntakeSlide.INSTANCE.inBetween(),
                                 Claw.INSTANCE.pick(),
                                 new ParallelGroup(
                                         Outtake.INSTANCE.Transfer(),
@@ -303,15 +314,16 @@ public class PedroAuto extends PedroOpMode {
                         )
                 ),// PARK
                 new SequentialGroup(
-                new ParallelGroup(
-                        new Delay(TimeSpan.fromMs(200)),
+                        new ParallelGroup(
+                                Outtake.INSTANCE.preTransferAuto(),
+                                new Delay(TimeSpan.fromMs(200)),
 
-                        Outtake.INSTANCE.toggleClaw(),
 
-                        new FollowPath(park),
-                        Outtake.INSTANCE.outtakeSlidesTransfer(),
-                        Outtake.INSTANCE.armPark()
-                ),
+
+                                new FollowPath(park),
+                                Outtake.INSTANCE.outtakeSlidesTransfer(),
+                                Outtake.INSTANCE.armPark()
+                        ),
                         Outtake.INSTANCE.wristPark()
                 )
         );
@@ -340,9 +352,16 @@ public class PedroAuto extends PedroOpMode {
     /** This method is called once at the init of the OpMode. **/
     @Override
     public void onInit() {
-        IntakeSlide.INSTANCE.Init().invoke();
-        Outtake.INSTANCE.resetEncoder().invoke();
+        OpModeData.Alliance alliance = OpModeData.Alliance.RED; // default
 
+        if (gamepad1.circleWasPressed()) {
+            alliance = OpModeData.Alliance.RED;
+        } else if (gamepad1.squareWasPressed()) {
+            alliance = OpModeData.Alliance.BLUE;
+        }
+        telemetry.addData("Alliance", alliance.name());
+        telemetry.addLine("Press CIRCLE for RED, SQUARE for BLUE");
+        telemetry.update();
 
         follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
         follower.setStartingPose(startPose);
